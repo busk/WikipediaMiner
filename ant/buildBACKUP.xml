@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     Aug 31, 2011 5:20:10 PM                                                                                                                      
+     ====================================================================== -->
+<project name="wikipedia-miner" default="deploy" basedir="..">
+	<property file="ant/build.properties"/>
+
+	<path id="classpath">
+		<fileset dir="${lib.dir}" />
+	</path>
+
+	<!-- ================================= 
+          target: clean              
+         ================================= -->
+    <target name="clean" description="removes all generated files">
+        <echo>Cleaning ${build.dir}</echo>
+		<delete dir="${build.dir}" /> 
+    </target>
+
+   <!-- ================================= 
+          target: build              
+         ================================= -->
+    <target name="build" depends="clean" description="compiles source to 'bin' directory">
+    		<echo>Creating the build directory</echo>
+    		<mkdir dir="${build.dir}/classes"/>
+     	<echo>Compiling the source code</echo>
+		<javac srcdir="${src.dir}" destdir="${build.dir}/classes" includeantruntime="false">
+			<classpath refid="classpath" />
+		</javac>
+    </target>
+
+   <!-- ================================= 
+          target: build-database             
+         ================================= -->
+	<target name="build-database" depends="build" description="constructs a database using the wikipedia configuration specified by wiki.conf property">
+    		<echo>Creating the database</echo>
+			<java classname="org.wikipedia.miner.util.EnvironmentBuilder" fork="true">
+				<classpath>
+					<path location="${build.dir}/classes/"/>
+					<path refid="classpath"/>
+				</classpath>
+				<arg value="${wiki.conf}" />
+				<jvmarg value="-Xmx2G" />
+			</java>
+    </target>
+
+    <!-- ================================= 
+          target: package              
+         ================================= -->
+    <target name="package" depends="build" description="creates jar and adds it to build directory">
+		<echo>Creating the jar file</echo>
+    		<mkdir dir="${build.dir}/jar"/>
+    	
+    		<jar destfile="${build.dir}/jar/${jar.mainModule}" >
+    			<fileset dir="${build.dir}">
+    				<include name="**/*.class"/>
+    			</fileset>
+    		</jar>
+    </target>
+
+    <!-- ================================= 
+          target: package-hadoop              
+         ================================= -->
+    <target name="package-hadoop" depends="package" description="creates hadoop-ready jar and adds it to build directory">
+		<echo>Creating the jar file suitable for hadoop jobs</echo>
+    	
+    		<jar destfile="${build.dir}/jar/${jar.hadoopModule}" >
+    			<fileset dir="${build.dir}">
+    				<include name="**/*.class"/>
+    			</fileset>
+    			<fileset dir=".">
+				<include name="${lib.dir}/*"/>
+    				<exclude name="${lib.dir}/hadoop*.jar"/>
+    			</fileset>
+    		</jar>
+       
+    </target>
+	
+	<!-- ================================= 
+          target: deploy              
+         ================================= -->
+    <target name="deploy" depends="build" description="creates a war file for deploying wikipedia miner website and services">
+    		<echo>Deploying WAR file</echo>
+	    	<war destfile="${build.dir}/wikipedia-miner.war" webxml="${conf.dir}/web.xml">
+	    	  <fileset dir="${web.content}"/>
+	    	  <lib dir="${lib.dir}">
+	    	  	<exclude name="servlet-api.jar"/>
+	    	  </lib>
+	    	  <classes dir="${build.dir}/classes"/>
+	    	</war>
+    	    	
+    </target>
+
+	<!-- ================================= 
+          target: deploy-expanded              
+         ================================= -->
+	<target name="deploy-expanded" depends="build" description="creates an unpacked directory (build/web) for deploying wikipedia miner website and services">
+		<copy todir="${build.dir}">
+			<fileset dir=".">
+			<include name="${web.content}/*"/>
+			</fileset>
+		</copy>
+		
+		
+		<mkdir dir="${build.dir}/${web.content}/WEB-INF/classes"/>
+	    <copy todir="${build.dir}/${web.content}/WEB-INF/classes">
+	    	<fileset dir="${build.dir}/classes/">
+	    	</fileset>
+	    </copy>	
+	    
+		<copy file="${conf.dir}/web.xml" todir="${build.dir}/${web.content}/WEB-INF/"/>
+
+	    <mkdir dir="${build.dir}/${web.content}/WEB-INF/lib"/>	
+	    <copy todir="${build.dir}/${web.content}/WEB-INF/lib">
+		  	<fileset dir="${lib.dir}">
+		   		<exclude name="servlet-api.jar"/>
+		   	</fileset>
+		</copy>
+	</target>
+	
+    <!-- ================================= 
+          target: doc              
+         ================================= -->
+    <target name="doc" description="compiles documentation to ${doc.dir} directory">
+		<echo>Creating java documentation</echo>
+        <javadoc sourcepath="${src.dir}" destdir="${doc.dir}">
+		</javadoc>
+    </target>
+
+</project>

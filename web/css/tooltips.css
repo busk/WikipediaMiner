@@ -1,0 +1,53 @@
+
+#wm_tooltip {
+        display: none ;
+        
+        
+
+	color: #444444 ;
+        font-size: 13px ;
+	font: Georgia serif;
+
+        text-align: left;
+        
+        position: absolute;
+        top: 20px ;
+        left: 20px ;
+        
+        width: 300px ;
+        
+	background-color: white ;
+        border: 1px solid #444444 ;
+        padding: 5px ;
+        
+}
+
+#wm_tooltip .loading {
+        background-image: url(../images/loading.gif) ;
+        width:32px ;
+        height:32px ;
+}
+
+#wm_tooltip img {
+        width:auto; 
+        height:auto;
+        
+        float: right ;
+        border: 1px solid #333333 ;
+        background-color: white ;       
+        margin-left: 5px ;
+}
+
+#wm_tooltip p {
+        color: #444444 ;
+        font-size: 13px ;
+}
+
+#wm_tooltip .break {
+
+	border: none ;
+	height: 0px ;
+	margin: 0px ;
+	padding: 0px ;
+	clear: both ;
+}
