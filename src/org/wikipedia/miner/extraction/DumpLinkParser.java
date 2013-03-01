@@ -23,7 +23,7 @@ public class DumpLinkParser {
 
 		StringBuffer tmp = new StringBuffer() ;
 		for (String namespace:siteInfo.getNamespaceKeysByNamespace().keySet()) {
-			tmp.append(namespace) ;
+			tmp.append(namespace.replaceAll("\\(", "\\\\(").replaceAll("\\)", "\\\\)")) ;
 			tmp.append("|") ;
 		}
 		tmp.deleteCharAt(tmp.length()-1) ;
