@@ -32,7 +32,7 @@ import org.wikipedia.miner.model.Page.PageType;
 
 /**
  * @author David Milne
- * 
+ *
  * Provides efficient iteration over the pages in Wikipedia
  */
 public class PageIterator implements Iterator<Page> {
@@ -45,20 +45,20 @@ public class PageIterator implements Iterator<Page> {
 
 	/**
 	 * Creates an iterator that will loop through all pages in Wikipedia.
-	 * 
+	 *
 	 * @param database an active (connected) Wikipedia database.
 	 */
 	public PageIterator(WEnvironment env) {
 
 		this.env = env ;
-		iter = env.getDbPage().getIterator() ; 
-		
+		iter = env.getDbPage().getIterator() ;
+
 		queueNext() ;
 	}
 
 	/**
 	 * Creates an iterator that will loop through all pages of the given type in Wikipedia.
-	 * 
+	 *
 	 * @param database an active (connected) Wikipedia database.
 	 * @param pageType the type of page to restrict the iterator to (ARTICLE, CATEGORY, REDIRECT or DISAMBIGUATION_PAGE)
 	 * @throws SQLException if there is a problem with the Wikipedia database.
@@ -66,9 +66,9 @@ public class PageIterator implements Iterator<Page> {
 	public PageIterator(WEnvironment env, PageType type)  {
 
 		this.env = env ;
-		iter = env.getDbPage().getIterator() ; 
+		iter = env.getDbPage().getIterator() ;
 		this.type = type ;
-		
+
 		queueNext() ;
 	}
 
@@ -84,23 +84,23 @@ public class PageIterator implements Iterator<Page> {
 
 	@Override
 	public Page next() {
-		
-		if (nextPage == null) 
+
+		if (nextPage == null)
 			throw new NoSuchElementException() ;
-		
+
 		Page p = nextPage ;
 		queueNext() ;
-		
+
 		return p ;
 	}
 
 	private void queueNext() {
 
 		try {
-			nextPage=toPage(iter.next()) ;
+			while ( (nextPage = toPage(iter.next()) ) == null ) { }
 
-			if (type != null) {
-				while (nextPage.getType() != type)
+			if (type != null && nextPage != null) {
+				while (nextPage == null || nextPage.getType() != type)
 					nextPage = toPage(iter.next());
 			}
 		} catch (NoSuchElementException e) {
@@ -117,10 +117,10 @@ public class PageIterator implements Iterator<Page> {
 
 	/*
 	public static void main(String[] args) throws Exception {
-		
+
 		DecimalFormat df = new DecimalFormat("0.000") ;
 
-		if (args.length != 1) {		
+		if (args.length != 1) {
 			System.out.println("Please specify a directory containing a fully prepared Wikipedia database") ;
 			return ;
 		}
@@ -128,33 +128,33 @@ public class PageIterator implements Iterator<Page> {
 		File envDir = new File(args[0]) ;
 
 		Wikipedia wikipedia = new Wikipedia(envDir) ;
-		
+
 		ProgressTracker tracker = new ProgressTracker(wikipedia.getEnvironment().getDbPage().getCount(), "Iterating pages", PageIterator.class) ;
 
 		Iterator<Page> iter = wikipedia.getPageIterator(PageType.article) ;
-		
-		
-		
+
+
+
 		int count = 0 ;
-		
+
 		while (iter.hasNext()) {
 			tracker.update() ;
 			Page p = iter.next() ;
-			
+
 			if (count%1000 == 0) {
 				System.out.println(p + " [" + p.getType() + "] - " + df.format(tracker.getTaskProgress())) ;
-				
+
 			}
-			
+
 			count++ ;
 		}
-		
+
 		System.out.println(count) ;
 	}*/
-	
+
 	public void close() {
 		iter.close();
-		
+
 	}
 }
 
