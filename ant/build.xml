@@ -24,7 +24,7 @@
                 <echo>Creating the build directory</echo>
                             <mkdir dir="${build.dir}/classes"/>
                                     <echo>Compiling the source code</echo>
-                                            <javac srcdir="${src.dir}" destdir="${build.dir}/classes" includeantruntime="false">
+                                            <javac srcdir="${src.dir}" destdir="${build.dir}/classes" includeantruntime="false" debug="on">
                                                         <classpath refid="classpath" />
                                                                 </javac>
                                                                     </target>
