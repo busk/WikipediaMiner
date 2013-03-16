@@ -350,12 +350,14 @@ public class LinkDetector extends TopicWeighter{
 			if (pos>0) {
 				linkText = linkText.substring(0, pos) ;
 			}
-			
-			linkText = Character.toUpperCase(linkText.charAt(0)) + linkText.substring(1) ;     // Get first char and capitalize
-			Article link = wikipedia.getArticleByTitle(linkText) ;
-			
-			if (link != null) 
-				links.add(link.getId()) ;
+
+			if (linkText.length() != 0) {
+				linkText = Character.toUpperCase(linkText.charAt(0)) + linkText.substring(1) ;     // Get first char and capitalize
+				Article link = wikipedia.getArticleByTitle(linkText) ;
+
+				if (link != null)
+					links.add(link.getId()) ;
+			}
 		}
 		links.add(article.getId()) ;
 		
